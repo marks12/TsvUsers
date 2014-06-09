@@ -20,7 +20,12 @@
     "require": {
         "php": ">=5.3.3",
         "zendframework/zend-cache":			"~2.1",
-	"marks12/tsv-directory":			"*"
+        "zf-commons/zfc-user":				"0.*",
+	"zf-commons/zfc-admin":				"0.*",
+	"bjyoungblood/bjy-authorize":			"1.4.*",
+	"bjyoungblood/bjy-profiler": 			"*",
+	"doctrine/doctrine-orm-module":			"0.*",
+
     },
     "suggests": {
         "zendframework/zend-developer-tools": "if you need to see current authorization details while developing",
