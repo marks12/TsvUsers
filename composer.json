@@ -1,0 +1,36 @@
+{
+    "name": "marks12/tsv-users",
+    "description": "User manager",
+    "type":         "library",
+    "license":      "BSD-3-Clause",
+    "homepage": 	"https://github.com/marks12/TsvUsers",
+    "keywords": [
+        "Directory",
+        "User Manager",
+        "zf2"
+    ],
+    "authors": [
+        {
+            "name":      "Vladimir Tsarevnikov",
+            "email":     "tsarevnikov.v@gmail.com",
+            "homepage":  "http://serveon.ru/",
+            "role":      "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zend-cache":			"~2.1",
+	"marks12/tsv-directory":			"*"
+    },
+    "suggests": {
+        "zendframework/zend-developer-tools": "if you need to see current authorization details while developing",
+        "zf-commons/zfc-user":                "zfc-user provides a good default setup to get started with bjyauthorize",
+        "zf-commons/zfc-user-doctrine-orm":   "If you want to use BjyAuthorize with Doctrine ORM"
+    },
+    "autoload": {
+        "psr-0": {
+            "TsvUsers\\": "src/"
+        }
+    }
+}
