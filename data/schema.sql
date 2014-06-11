@@ -3,7 +3,7 @@
 -- Table structure for table `user`
 --
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE `user` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
--- Dumping data for table `user`
+-- Dumping data for table `user` 
 --
 
 INSERT INTO `user` (`user_id`, `username`, `email`, `display_name`, `password`, `state`) VALUES
@@ -28,7 +28,7 @@ INSERT INTO `user` (`user_id`, `username`, `email`, `display_name`, `password`, 
 -- Table structure for table `user_role`
 --
 
-CREATE TABLE IF NOT EXISTS `user_role` (
+CREATE TABLE `user_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `roleId` varchar(255) NOT NULL,
   `is_default` tinyint(1) NOT NULL,
@@ -49,7 +49,7 @@ INSERT INTO `user_role` (`id`, `roleId`, `is_default`, `parent_id`) VALUES
 -- Table structure for table `user_role_linker`
 --
 
-CREATE TABLE IF NOT EXISTS `user_role_linker` (
+CREATE TABLE `user_role_linker` (
   `user_id` int(11) unsigned NOT NULL,
   `role_id` varchar(255) NOT NULL,
   PRIMARY KEY (`user_id`,`role_id`),
