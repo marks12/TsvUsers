@@ -21,5 +21,5 @@ User management
 ## Enter
 If you have base config for ZfcUser module, you can authorize in http://domain.nameuser/login
 Then, if your user account have admin role, you can going to admin interface in ZfcAdmin module, for example http://domain.nameuser/admin and you will see 
-new link in main menu like '������������'. Use this interfaces for user management.
+new link in main menu like 'Пользователи'. Use this interfaces for user management.
 
