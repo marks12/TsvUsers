@@ -1,6 +1,23 @@
+-- phpMyAdmin SQL Dump
+-- version 3.4.11.1deb2
+-- http://www.phpmyadmin.net
+--
+-- Хост: localhost
+-- Время создания: Июн 13 2014 г., 19:53
+-- Версия сервера: 5.5.35
+-- Версия PHP: 5.4.4-14+deb7u8
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 --
--- Table structure for table `user`
+-- База данных: `admin_kodeks`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `user`
 --
 
 CREATE TABLE `user` (
@@ -16,7 +33,7 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
--- Dumping data for table `user` 
+-- Дамп данных таблицы `user`
 --
 
 INSERT INTO `user` (`user_id`, `username`, `email`, `display_name`, `password`, `state`) VALUES
@@ -25,28 +42,29 @@ INSERT INTO `user` (`user_id`, `username`, `email`, `display_name`, `password`, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_role`
+-- Структура таблицы `user_role`
 --
 
 CREATE TABLE `user_role` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` varchar(255) NOT NULL,
   `roleId` varchar(255) NOT NULL,
   `is_default` tinyint(1) NOT NULL,
   `parent_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `user_role`
+-- Дамп данных таблицы `user_role`
 --
 
 INSERT INTO `user_role` (`id`, `roleId`, `is_default`, `parent_id`) VALUES
-(2, 'user', 1, NULL);
+('admin', 'admin', 0, '2'),
+('user', 'user', 1, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_role_linker`
+-- Структура таблицы `user_role_linker`
 --
 
 CREATE TABLE `user_role_linker` (
@@ -57,7 +75,7 @@ CREATE TABLE `user_role_linker` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `user_role_linker`
+-- Дамп данных таблицы `user_role_linker`
 --
 
 INSERT INTO `user_role_linker` (`user_id`, `role_id`) VALUES
