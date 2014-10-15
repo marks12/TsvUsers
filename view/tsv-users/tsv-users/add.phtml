@@ -1,0 +1,31 @@
+<h1>Добавление пользователя</h1>
+
+<form role="form" method="POST">
+  <div class="form-group">
+    <label for="display_name">Отображаемое имя</label>
+    <input type="text" class="form-control" id="display_name" name="display_name" placeholder="Укажите отображаемое имя" required>
+  </div>
+  <div class="form-group">
+    <label for="username">Имя пользователя</label>
+    <input type="text" class="form-control" id="username" name="username" placeholder="Укажите имя пользователя" required>
+  </div>
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Укажите email">
+  </div>
+  <div class="form-group">
+    <label for="password">Пароль</label>
+    <input type="password" class="form-control" name="password"  id="password" placeholder="Без изменений" required>
+  </div>
+  <div class="form-group">
+    <label>Роли</label>
+    <?php if(isset($this->roles)) {?>
+    <?php foreach($this->roles as $role){?>
+    <div class="row">
+    	<div class="col-md-12"><input value="<?php echo $role->__get('roleId');?>" type="checkbox" name="roles[]"<?php if($role->isAssignedRole()){?> checked<?php }?>> <?php echo $role->__get('roleId');?></div>
+    </div>
+    <?php }}?>
+  </div>
+  <a class="btn btn-info" href="<?php echo $this->url('zfcadmin/tsv-users/default');?>">Отмена</a>
+  <button type="submit" class="btn btn-success">Сохранить</button>
+</form>

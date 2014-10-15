@@ -10,85 +10,148 @@
 namespace TsvUsers\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use TsvUsers\Entity\Users;
-use TsvUsers\Entity\Project;
-use TsvUsers\Entity\Address;
+use Zend\View\Model\ViewModel;
+use Zend\Form\Element\Password;
+use TsvUsers\Entity\User;
+
+
 
 class TsvUsersController extends AbstractActionController
 {
-// 	public function indexAction() {
-// 	    $objectManager = $this
-// 	        ->getServiceLocator()
-// 	        ->get('Doctrine\ORM\EntityManager');
-	
-// 	    $users = new \TsvUsers\Entity\Users();
-// 	    $users->__set('fullName','Marco Pivetta');
-
-// 	    $objectManager->persist($users); // $user is now "managed"
-// 	    $objectManager->flush();// commit changes to db
-	
-// 	    die(var_dump($users->__get("id"))); // yes, I'm lazy
-// 	}
-
     public function indexAction()
     {
 
-	    $objectManager = $this
- 		        ->getServiceLocator()
-   		        ->get('Doctrine\ORM\EntityManager');
+    	$vm = new ViewModel();
     	
-//     	$user1 = new Users();
-//     	$user1->__set('fullName','Marco Pivetta');
-//     	$objectManager->persist($user1);
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
     	
-//     	$user2 = new Users();
-//     	$user2->__set('fullName','Michaël Gallego');
-//     	$objectManager->persist($user2);
+    	$users = $em->getRepository('TsvUsers\Entity\User')->findAll();
     	
+    	$vm->setVariable("users", $users);
     	
-//     	$objectManager->flush();
-
-// 	    $user1 = $objectManager->find('TsvUsers\Entity\Users', 41);
-	    
-// 	    var_dump($user1->__get('fullName')); // Marco Pivetta
-	    
-// 	    $user2 = $objectManager
-// 	    ->getRepository('TsvUsers\Entity\Users')
-// 	    ->findOneBy(array('fullName' => 'Michaël Gallego'));
-	    
-// 	    var_dump($user2->__get('fullName')); // Michaël Gallego
-	    
-	    
-//  	    die(var_dump($user2->__get("id"))); // yes, I'm lazy
-    	
-	    
-// 	    $user = new Users();
-// 	    $user->__set('fullName','Marco Pivetta');
-// 	    $objectManager->persist($user);
-	    
-// 	    $address = new Address();
-// 	    $address->__set('city','Frankfurt');
-// 	    $address->__set('country','Germany');
-// 	    $objectManager->persist($address);
-	    
-// 	    $project = new Project();
-// 	    $project->__set('name','Doctrine ORM');
-// 	    $objectManager->persist($project);
-	    
-// 	    $user->__set('address',$address);
-// 	    $user->__get('projects')->add($project);
-// 	    $objectManager->flush();
-	    
-	    
-	    
-	    
-        return array();
+        return $vm;
     }
 
-    public function fooAction()
+    public function editAction()
     {
-        // This shows the :controller and :action parameters in default route
-        // are working when you browse to /tsvUsers/tsv-users/foo
-        return array();
+    	$vm = new ViewModel();
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+    	
+    	$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$this->getEvent()->getRouteMatch()->getParam('id')));
+    	$roles = $em->getRepository('TsvUsers\Entity\Role')->findAll();
+    	
+    	if(!$user)
+    		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
+    	
+    	$request = $this->getRequest();
+    	
+//     	$this->backwardCompatibility = false;
+//     	$this->cost = 14;
+    	
+//     	var_dump($user->__get('password'));
+    	
+//     	var_dump($this->getServiceLocator()->get('zfcuser_user_hydrator'));
+    	
+//     	var_dump($this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create('virq3t4'));
+//     	var_dump($this->->getCryptoService()->create($data['newCredential']));
+//     	$this->serviceManager->get('zfcuser_user_hydrator')
+//     	$this->formHydrator = $this->serviceManager->get('zfcuser_user_hydrator');
+//     	exit();
+
+    	
+    	if($request->isPost())
+    	{
+    		$user->__set('username',$request->getPost()->username);
+    		$user->__set('display_name',$request->getPost()->display_name);
+    		$user->__set('email',$request->getPost()->email);
+    		
+    		if(trim($request->getPost()->password))
+    			$user->__set('password',$this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($request->getPost()->password));
+    		
+    		$em->persist($user);
+    		$em->flush();
+
+    		/**
+    		 * roles
+    		 */
+    		foreach ($user->__get('roles') as $role)
+    			$user->__get('roles')->removeElement($role);
+    		
+    		$roles = $em->getRepository('TsvUsers\Entity\Role')->findBy(array("roleId"=>$request->getPost()->roles));
+
+    		foreach ($roles as $role)
+    		{
+    			$user->__get('roles')->add($role);
+    		}
+    		
+    		$em->persist($user);
+    		$em->flush();
+    		
+    		
+    		
+    		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
+    	}
+
+    	foreach ($roles as $role)
+    	{
+   			foreach ($user->__get('roles') as $user_role)
+   				if($user_role->__get('roleId') == $role->__get('roleId'))
+   					$role->assingRole();
+    	}
+    	
+    	$vm->setVariable("user", $user);
+    	$vm->setVariable("roles", $roles);
+    	
+        return $vm;
+    }
+    public function deleteAction()
+    {
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$this->getEvent()->getRouteMatch()->getParam('id')));
+		
+		$em->remove($user);
+		$em->flush();
+		
+		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
+    }
+    public function addAction()
+    {    	
+    	$vm = new ViewModel();
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+    	$roles = $em->getRepository('TsvUsers\Entity\Role')->findAll();
+    	
+    	$vm->setVariable("roles",$roles);
+    	
+    	$request = $this->getRequest();
+    	
+    	if($request->isPost())
+    	{
+    		$user = new User();
+    		
+    		$user->__set('username',$request->getPost()->username);
+    		$user->__set('display_name',$request->getPost()->display_name);
+    		$user->__set('email',$request->getPost()->email);
+    		$user->__set('state',1);
+    		
+   			$user->__set('password',$this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($request->getPost()->password));
+
+    		$em->persist($user);
+    		$em->flush();
+    	
+    		$roles = $em->getRepository('TsvUsers\Entity\Role')->findBy(array("roleId"=>$request->getPost()->roles));
+    	
+    		foreach ($roles as $role)
+    		{
+    			$user->__get('roles')->add($role);
+    		}
+    	
+    		$em->persist($user);
+    		$em->flush();
+    	
+    		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
+    	}
+    	
+    	return $vm;
+// 		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
     }
 }

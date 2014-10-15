@@ -1,3 +1,36 @@
-<strong>Module:</strong>        TsvUsers &raquo;
-<strong>Controller:</strong>    TsvUsers &raquo;
-<strong>Action:</strong>        index
+<h1>Управление пользователями</h1>
+
+<a class="btn btn-success" href="<?php echo $this->url('zfcadmin/tsv-users/default',array("action"=>"add"));?>">Добавить пользователя</a>
+<br>
+<br>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Имя пользователя</th>
+			<th>E-mail</th>
+			<th>Отображаемое имя</th>
+			<th>Роли</th>
+			<th>#</th>
+		</tr>
+	</thead>
+	<?php if(isset($this->users)) {?>
+	<tbody>
+		<?php foreach($this->users as $user){?>
+			<tr>
+				<td><?php echo $user->__get('user_id')?></td>
+				<td><?php echo $user->__get('username')?></td>
+				<td><?php echo $user->__get('email')?></td>
+				<td><?php echo $user->__get('display_name')?></td>
+				<td>
+					<?php foreach($user->__get('roles') as $role) {?>
+						<span class="label label-info"><?php echo $role->__get('roleId');?></span>
+					<?php }?>
+				</td>
+				<td><a href="<?php echo $this->url('zfcadmin/tsv-users/default',array("action"=>"edit","id"=>$user->__get('user_id')));?>">Редактировать</a>
+				<a onclick="if(!confirm('Вы действительно хотите удалить данного пользователя?')) return false;" href="<?php echo $this->url('zfcadmin/tsv-users/default',array("action"=>"delete","id"=>$user->__get('user_id')));?>">Удалить</a></td>
+			</tr>
+		<?php }?>
+	</tbody>
+	<?php }?>
+</table>
