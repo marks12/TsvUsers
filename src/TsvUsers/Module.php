@@ -49,6 +49,7 @@ class Module implements AutoloaderProviderInterface
     	return array(
     			'invokables' => array(
 //     					'TsvDirectory\ContentProvider' => 'TsvDirectory\ContentProvider',
+    					'ZfcUser\Form\Login'                => 'TsvUsers\Form\Login',
     			),
     			'factories' => array(
 //     					'zfcuser_module_options'                        => 'ZfcUser\Factory\ModuleOptionsFactory',
