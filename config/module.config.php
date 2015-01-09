@@ -73,7 +73,7 @@ return array(
 							'label' => 'Пользователи',
 							'route' => 'zfcadmin/tsv-users',
 					),
-					'users' => array(
+					'logout' => array(
 							'label' => 'Выход',
 							'route' => 'zfcuser/logout',
 							'order' => 100,
