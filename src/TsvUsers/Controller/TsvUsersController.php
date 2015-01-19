@@ -13,22 +13,18 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Form\Element\Password;
 use TsvUsers\Entity\User;
-
-
+use Zend\Console\Request as ConsoleRequest;
+use Zend\Console\Adapter\AdapterInterface as Console;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 
 class TsvUsersController extends AbstractActionController
 {
     public function indexAction()
     {
-
     	$vm = new ViewModel();
-    	
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-    	
     	$users = $em->getRepository('TsvUsers\Entity\User')->findAll();
-    	
     	$vm->setVariable("users", $users);
-    	
         return $vm;
     }
 
@@ -36,29 +32,22 @@ class TsvUsersController extends AbstractActionController
     {
     	$vm = new ViewModel();
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-    	
     	$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$this->getEvent()->getRouteMatch()->getParam('id')));
     	$roles = $em->getRepository('TsvUsers\Entity\Role')->findAll();
-    	
     	if(!$user)
     		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
-    	
     	$request = $this->getRequest();
     	
 //     	$this->backwardCompatibility = false;
 //     	$this->cost = 14;
-    	
 //     	var_dump($user->__get('password'));
-    	
 //     	var_dump($this->getServiceLocator()->get('zfcuser_user_hydrator'));
-    	
 //     	var_dump($this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create('virq3t4'));
 //     	var_dump($this->->getCryptoService()->create($data['newCredential']));
 //     	$this->serviceManager->get('zfcuser_user_hydrator')
 //     	$this->formHydrator = $this->serviceManager->get('zfcuser_user_hydrator');
 //     	exit();
 
-    	
     	if($request->isPost())
     	{
     		$user->__set('username',$request->getPost()->username);
@@ -87,8 +76,6 @@ class TsvUsersController extends AbstractActionController
     		$em->persist($user);
     		$em->flush();
     		
-    		
-    		
     		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
     	}
 
@@ -104,6 +91,7 @@ class TsvUsersController extends AbstractActionController
     	
         return $vm;
     }
+
     public function deleteAction()
     {
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
@@ -154,4 +142,5 @@ class TsvUsersController extends AbstractActionController
     	return $vm;
 // 		return $this->redirect()->toRoute('zfcadmin/tsv-users/default');
     }
+
 }

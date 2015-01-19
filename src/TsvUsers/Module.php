@@ -12,8 +12,11 @@ namespace TsvUsers;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\Console\Adapter\AdapterInterface as Console;
 
-class Module implements AutoloaderProviderInterface
+class Module implements AutoloaderProviderInterface, ConsoleUsageProviderInterface, ConfigProviderInterface
 {
     public function getAutoloaderConfig()
     {
@@ -58,6 +61,22 @@ class Module implements AutoloaderProviderInterface
 //     			'aliases' => array(
 //     					'zfcuser_register_form_hydrator' => 'zfcuser_user_hydrator'
 //     			),
+    	);
+    }
+    
+    public function getConsoleUsage(Console $console){
+    	return array(
+    			// Describe available commands
+    			'userlist'		=> 'List exists users',
+    			'adduser'		=> 'Add new user',
+    			'removeuser'	=> 'Remove user from database',
+    			'listroles'		=> 'List exists roles',
+    			'addrole'		=> 'Add new role to database',
+    			'role4user'		=> 'Set role for users',
+    			'rmRFU'			=> 'Remove role from user',
+    
+    			// Describe expected parameters
+    			array( 'Use this commands for manage users and roles in TsvUsers module' ),
     	);
     }
 }
