@@ -17,6 +17,7 @@ use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 use Zend\Console\ColorInterface as color;
 use TsvUsers\Entity\Role;
+use Zend\Text\Table\Table as Table;
 
 class ConsoleTsvUsersController extends AbstractActionController
 {
@@ -27,34 +28,60 @@ class ConsoleTsvUsersController extends AbstractActionController
    
     public function cUserlistAction()
     {
-    	$return = "User list function";
+    	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "list of existing users \n=============\n", color::RED);
     	
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
     	
     	$users = $em->getRepository('TsvUsers\Entity\User')->findAll();
 
-    	foreach ($users as $user)
+    	$table = new Table(array('columnWidths' => array(5,20, 40, 20, 10)));
+    	$table->appendRow(array('Id','Name', 'Email', 'Roles', 'State'));
+
+    	if(!count($users))
     	{
-    		$return = "| ".$user->__get('username')." | ";
+    		$console->write( "No users in the database\n", color::YELLOW);
+    		return '';
     	}
     	
-    	return $return."\n";
+    	
+    	foreach ($users as $user)
+    	{
+    		$roles_arr = array();
+    		foreach ($user->__get('roles') as $role)
+    			$roles_arr[] = $role->__get('id');
+    		
+    		if($user->__get('state') == '1')
+    			$state = 'Active';
+    		else 
+    			$state = 'Disabled';
+    		
+    		$table->appendRow(array((string)$user->__get('user_id'),$user->__get('username'), $user->__get('email'), implode(",", $roles_arr), $state));
+    		
+    	}
+    	 
+    	$console->write( (string)$table, color::GREEN);
+    	
+    	return '';
     }
     
     public function cListRolesAction()
     {
     	$console = $this->getServiceLocator()->get('console');
- 		$console->write( "List existen roles \n=============\n", color::RED);
+ 		$console->write( "List of existing roles \n=============\n", color::RED);
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
     	$roles = $em->getRepository('TsvUsers\Entity\Role')->findAll();
 
     	$roles_ar = array();
     	
     	if(!count($roles))
-    		$console->write( "No one roles founded in database\n"); 
+    	{
+    		$console->write( "We did not find any role in DB\n"); 
+    		return '';
+    	}
     	else
     	{
-    		$console->write( "Founded (".count($roles).") ", color::GREEN);
+    		$console->write( "Found (".count($roles).") ", color::GREEN);
     		foreach ($roles as $role)
     		{
     			$roles_ar[] = $role->__get('id');
@@ -97,7 +124,7 @@ class ConsoleTsvUsersController extends AbstractActionController
     	
     	if(!in_array($data, $values))
         {
-    		$console->write( "Please select on of values [".implode(',', $values)."]. Press CTRL+C for cancel. \n", color::YELLOW);
+    		$console->write( "Please select one of values [".implode(',', $values)."]. Press CTRL+C for cancel. \n", color::YELLOW);
     		return $this->getUserChoice($console, $show_title, $values);
     	}
    		else
@@ -154,6 +181,7 @@ class ConsoleTsvUsersController extends AbstractActionController
     public function cAdduserAction()
     {
     	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Add user \n=============\n", color::RED);
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
 
     	$user = new User();
@@ -171,9 +199,11 @@ class ConsoleTsvUsersController extends AbstractActionController
     		return '';
     	}
     	
+    	$password = $this->getConsoleText($console,"Please type user password",255,4);
+    	
     	$user->__set('email', $mail);
-    	$user->__set('display_name', $this->getConsoleText($console,"Please type user name for Display",255,0));
-    	$user->__set('password', $this->getConsoleText($console,"Please type user password",255,4));
+    	$user->__set('display_name', $this->getConsoleText($console,"Please type user name for display",255,0));
+    	$user->__set('password', $this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($password));
     	
     	$is_active = $this->getUserChoice($console,"Is user active ?",array('y','n'));
     	$is_active = $is_active == 'y' ? 1 : 0;
@@ -197,7 +227,7 @@ class ConsoleTsvUsersController extends AbstractActionController
     	if(count($default_roles))
     		$roles_message = "Default roles [".implode(",", $roles_ids)."] was added.";
     	else 
-    		$roles_message = "No default roles added. You can use role4user function for add role for user.";
+    		$roles_message = "Default roles was not added. You can use role4user function for add role for user.";
     	
     	$console->write("User $username successfuly created. $roles_message\n");
     	
@@ -207,11 +237,17 @@ class ConsoleTsvUsersController extends AbstractActionController
     public function cRemoveUserAction()
     {
     	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Remove user \n=============\n", color::RED);
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
     	
-    	$mail = $this->getConsoleText($console,"Please type user email which you want to remove",255,7);
+    	$mailOrId = $this->getConsoleText($console,"Please type user Email or user Id which you want to remove",255,1);
     	
-    	$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mail));
+    	if(is_numeric($mailOrId))
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$mailOrId));
+    	else
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mailOrId));
+    	
+    	$mail = $user->__get('email');
     	
     	if($user)
     	{
@@ -220,7 +256,29 @@ class ConsoleTsvUsersController extends AbstractActionController
     		$console->write("User $mail was deleted from database\n",color::RED);
     	}
     	else 
-    		$console->write("User $mail not found in database\n",color::LIGHT_BLUE);
+    		$console->write("User $mail was not found in database\n",color::LIGHT_BLUE);
+    	
+    	return '';
+    }
+    
+    public function cRemoveRoleAction()
+    {
+    	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Remove role \n=============\n", color::RED);
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+    	
+    	$role_id = $this->getConsoleText($console,"Please type role which you want to remove",255,1);
+    	
+   		$role = $em->getRepository('TsvUsers\Entity\Role')->findOneBy(array("id"=>$role_id));
+    	
+    	if($role)
+    	{
+    		$em->remove($role);
+    		$em->flush();
+    		$console->write("Role $role_id was deleted from database\n",color::RED);
+    	}
+    	else 
+    		$console->write("Role $role_id was not found in database\n",color::LIGHT_BLUE);
     	
     	return '';
     }
@@ -228,10 +286,17 @@ class ConsoleTsvUsersController extends AbstractActionController
     public function crmRFUAction()
     {
     	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Remove role from user \n=============\n", color::RED);
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
     	
-    	$mail = $this->getConsoleText($console,"Please type user email which you want to remove some roles",255,7);
-    	$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mail));
+    	$mailOrId = $this->getConsoleText($console,"Please type user Email or user Id which you want to remove",255,1);
+    	
+    	if(is_numeric($mailOrId))
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$mailOrId));
+    	else
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mailOrId));
+    	
+    	$mail = $user->__get('email');
     	
     	if($user)
     	{
@@ -268,10 +333,17 @@ class ConsoleTsvUsersController extends AbstractActionController
     public function cRole4UserAction()
     {
     	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Add role for user \n=============\n", color::RED);
     	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
     	
-    	$mail = $this->getConsoleText($console,"Please type user email which you want to remove some roles",255,7);
-    	$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mail));
+    	$mailOrId = $this->getConsoleText($console,"Please type user Email or Id which you want to remove some roles",255,1);
+    	
+    	if(is_numeric($mailOrId))
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$mailOrId));
+    	else
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mailOrId));
+    	
+    	$mail = $user->__get('email');
     	
     	$user_roles = array();
     	foreach ($user->__get('roles') as $role)
@@ -292,6 +364,12 @@ class ConsoleTsvUsersController extends AbstractActionController
     		if(!in_array($role->__get('id'),$user_roles))
     			$not_exists_roles[] = $role->__get('id');
     	
+    	if(!count($not_exists_roles))
+    	{
+    		$console->write("User $mail have all existing roles. Nothing to add.\n",color::GREEN);
+    		return '';
+    	}
+    		
     	$new_role = $this->getUserChoice($console,"Plese select role adding for user '{$user->__get('username')}'",$not_exists_roles);
 
     	$role = $em->getRepository('TsvUsers\Entity\Role')->findOneBy(array("id"=>$new_role));
@@ -306,4 +384,97 @@ class ConsoleTsvUsersController extends AbstractActionController
     	return '';
     }
     
+    public function cResetPassAction()
+    {
+    	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Change user password \n=============\n", color::RED);
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+    	 
+    	$mailOrId = $this->getConsoleText($console,"Please type user Email or Id which you want to reset password",255,1);
+    	 
+    	if(is_numeric($mailOrId))
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("user_id"=>$mailOrId));
+    	else
+    		$user = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mailOrId));
+    	 
+    	$mail = $user->__get('email');
+    	
+    	$password = $this->getConsoleText($console,"Please type user password",255,4);
+    	 
+    	$user->__set('password', $this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($password));
+    	
+    	$console->write("Password was successfuly changed for user $mail\n",color::GREEN);
+    	
+    	return '';
+    }
+    
+    public function cdrauAction()
+    {
+    	$console = $this->getServiceLocator()->get('console');
+    	$console->write( "Adding default roles [user,admin] and default administrator\n=============\n", color::RED);
+    	$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+    	$roles = $em->getRepository('TsvUsers\Entity\Role')->findBy(array("id"=>array("admin","user")));
+    	
+    	if(count($roles))
+    	{
+    		$console->write("We found standart roles in database. We cant add default roles when it existing.\n",color::RED);
+    		$this->cListRolesAction();
+    		return '';
+    	}
+    	 
+    	$role1 = new Role();
+    	$role1->__set("id", 'user');
+    	$role1->__set("roleId", 'user');
+    	$role1->__set("is_default", 1);
+    	$role1->__set("parent", null);
+    	$em->persist($role1);
+    	$em->flush();
+    	
+    	$role2 = new Role();
+    	$role2->__set("id", 'admin');
+    	$role2->__set("roleId", 'admin');
+    	$role2->__set("is_default", 0);
+    	$role2->__set("parent", $role1);
+    	$em->persist($role2);
+    	$em->flush();
+    	
+    	$user = new User();
+    	 
+    	$username = 'Admin';
+    	$user->__set('username', $username);
+    	 
+    	$mail = $this->getConsoleText($console,"Please type user e-mail",255,7);
+    	$exists_email = $em->getRepository('TsvUsers\Entity\User')->findOneBy(array("email"=>$mail));
+    	if($exists_email)
+    	{
+    		$console->write("User $mail already exists\n",color::RED);
+    		return '';
+    	}
+    	 
+    	$password = $this->getConsoleText($console,"Please type user password",255,4);
+    	 
+    	$user->__set('email', $mail);
+    	$user->__set('display_name', 'Administrator');
+    	$user->__set('password', $this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($password));
+    	$user->__set("state", 1);
+    	 
+    	$default_roles = $em->getRepository('TsvUsers\Entity\Role')->findBy(array("id"=>array('user','admin')));
+    	
+    	$roles_ids = array();
+
+    	if($default_roles)
+    	foreach ($default_roles as $role)
+    	{
+    		$user->__get('roles')->add($role);
+    		$roles_ids[] = $role->__get('id');
+    	}
+    	 
+    	$em->persist($user);
+    	$em->flush();
+    	  	
+    	$this->cListRolesAction();
+    	$this->cUserlistAction();   	
+    	
+    	return '';
+    }
 }

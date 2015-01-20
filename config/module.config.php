@@ -153,6 +153,33 @@ return array(
 											),
 									),
 							),
+							'resetpass' => array(
+									'options' => array(
+											'route'    => 'resetpass',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cResetPass'
+											),
+									),
+							),
+							'drau' => array(
+									'options' => array(
+											'route'    => 'drau',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cdrau'
+											),
+									),
+							),
+							'removerole' => array(
+									'options' => array(
+											'route'    => 'removerole',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cRemoveRole'
+											),
+									),
+							),
 					),
 			),
 	),

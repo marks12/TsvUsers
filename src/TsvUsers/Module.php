@@ -72,8 +72,11 @@ class Module implements AutoloaderProviderInterface, ConsoleUsageProviderInterfa
     			'removeuser'	=> 'Remove user from database',
     			'listroles'		=> 'List exists roles',
     			'addrole'		=> 'Add new role to database',
+    			'removerole'	=> 'Remove role from database',
     			'role4user'		=> 'Set role for users',
     			'rmRFU'			=> 'Remove role from user',
+    			'resetpass'		=> 'Reset user password',
+    			'drau'			=> 'Adding default roles [user,admin] and default user Admin with your password',
     
     			// Describe expected parameters
     			array( 'Use this commands for manage users and roles in TsvUsers module' ),
