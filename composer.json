@@ -18,19 +18,13 @@
     ],
     "minimum-stability": "dev",
     "require": {
-		"php": ">=5.3.3"
-    },
-    "suggests": {
-        "zendframework/zend-developer-tools": "if you need to see current authorization details while developing",
-        "zf-commons/zfc-user":                "zfc-user provides a good default setup to get started with bjyauthorize",
-        "zf-commons/zfc-user-doctrine-orm":   "If you want to use BjyAuthorize with Doctrine ORM",
-       	"zendframework/zend-cache":				"~2.1",
-		"zf-commons/zfc-user":					"dev-msater",
-		"zf-commons/zfc-admin":					"dev-master",
-		"bjyoungblood/bjy-authorize":			"dev-master*",
-		"bjyoungblood/bjy-profiler": 			"*",
-		"doctrine/doctrine-orm-module":			"dev-master",
-		"zf-commons/zfc-user-doctrine-orm":		"dev-master"
+		"php": ">=5.3.3",
+		"zendframework/zend-developer-tools"	:	"@dev",
+		"zf-commons/zfc-user"					:	"2.0.*@dev",
+		"zf-commons/zfc-user-doctrine-orm"		:	"0.1.*@dev",
+		"zf-commons/zfc-admin"					:	"dev-master",
+		"bjyoungblood/bjy-authorize"			:	"1.5.*@dev",
+		"doctrine/doctrine-orm-module"			: 	"dev-master"
     },
     "autoload": {
         "psr-0": {

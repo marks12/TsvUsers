@@ -12,8 +12,11 @@ namespace TsvUsers;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\Console\Adapter\AdapterInterface as Console;
 
-class Module implements AutoloaderProviderInterface
+class Module implements AutoloaderProviderInterface, ConsoleUsageProviderInterface, ConfigProviderInterface
 {
     public function getAutoloaderConfig()
     {
@@ -49,6 +52,7 @@ class Module implements AutoloaderProviderInterface
     	return array(
     			'invokables' => array(
 //     					'TsvDirectory\ContentProvider' => 'TsvDirectory\ContentProvider',
+    					'ZfcUser\Form\Login'                => 'TsvUsers\Form\Login',
     			),
     			'factories' => array(
 //     					'zfcuser_module_options'                        => 'ZfcUser\Factory\ModuleOptionsFactory',
@@ -57,6 +61,25 @@ class Module implements AutoloaderProviderInterface
 //     			'aliases' => array(
 //     					'zfcuser_register_form_hydrator' => 'zfcuser_user_hydrator'
 //     			),
+    	);
+    }
+    
+    public function getConsoleUsage(Console $console){
+    	return array(
+    			// Describe available commands
+    			'userlist'		=> 'List exists users',
+    			'adduser'		=> 'Add new user',
+    			'removeuser'	=> 'Remove user from database',
+    			'listroles'		=> 'List exists roles',
+    			'addrole'		=> 'Add new role to database',
+    			'removerole'	=> 'Remove role from database',
+    			'role4user'		=> 'Set role for users',
+    			'rmRFU'			=> 'Remove role from user',
+    			'resetpass'		=> 'Reset user password',
+    			'drau'			=> 'Adding default roles [user,admin] and default user Admin with your password',
+    
+    			// Describe expected parameters
+    			array( 'Use this commands for manage users and roles in TsvUsers module' ),
     	);
     }
 }

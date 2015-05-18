@@ -18,6 +18,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'TsvUsers\Controller\TsvUsers' => 'TsvUsers\Controller\TsvUsersController',
+            'TsvUsers\Controller\ConsoleTsvUsers' => 'TsvUsers\Controller\ConsoleTsvUsersController',
         ),
     ),
     'router' => array(
@@ -73,7 +74,113 @@ return array(
 							'label' => 'Пользователи',
 							'route' => 'zfcadmin/tsv-users',
 					),
+					'logout' => array(
+							'label' => 'Выход',
+							'route' => 'zfcuser/logout',
+							'order' => 100,
+					),
 			),
 
+	),
+	'service_manager' => array(
+		'invokables' => array(
+			'ZfcUser\Form\Login'	=>	'TsvUsers\Form\Login',
+		),
+	),
+	'console' => array(
+			'router' => array(
+					'routes' => array(
+							'userlist' => array(
+									'options' => array(
+											'route'    => 'userlist',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cUserlist'
+											),
+									),
+							),
+							'adduser' => array(
+									'options' => array(
+											'route'    => 'adduser',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cAdduser'
+											),
+									),
+							),
+							'removeuser' => array(
+									'options' => array(
+											'route'    => 'removeuser',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cRemoveUser'
+											),
+									),
+							),
+							'listroles' => array(
+									'options' => array(
+											'route'    => 'listroles',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cListRoles'
+											),
+									),
+							),
+							'addrole' => array(
+									'options' => array(
+											'route'    => 'addrole',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cAddRole'
+											),
+									),
+							),
+							'role4user' => array(
+									'options' => array(
+											'route'    => 'role4user',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cRole4User'
+											),
+									),
+							),
+							'rmRFU' => array(
+									'options' => array(
+											'route'    => 'rmRFU',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'crmRFU'
+											),
+									),
+							),
+							'resetpass' => array(
+									'options' => array(
+											'route'    => 'resetpass',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cResetPass'
+											),
+									),
+							),
+							'drau' => array(
+									'options' => array(
+											'route'    => 'drau',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cdrau'
+											),
+									),
+							),
+							'removerole' => array(
+									'options' => array(
+											'route'    => 'removerole',
+											'defaults' => array(
+													'controller' => 'TsvUsers\Controller\ConsoleTsvUsers',
+													'action'     => 'cRemoveRole'
+											),
+									),
+							),
+					),
+			),
 	),
 );
