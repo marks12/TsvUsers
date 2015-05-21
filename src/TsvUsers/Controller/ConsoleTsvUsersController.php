@@ -18,6 +18,7 @@ use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 use Zend\Console\ColorInterface as color;
 use TsvUsers\Entity\Role;
 use Zend\Text\Table\Table as Table;
+use Zend\Crypt\Password\Bcrypt;
 
 class ConsoleTsvUsersController extends AbstractActionController
 {
@@ -452,10 +453,13 @@ class ConsoleTsvUsersController extends AbstractActionController
     	}
     	 
     	$password = $this->getConsoleText($console,"Please type user password",255,4);
-    	 
+
+    	$bcrypt = new Bcrypt(array("cost"=>14));
+    	$pass = $bcrypt->create($password);
+    	
     	$user->__set('email', $mail);
     	$user->__set('display_name', 'Administrator');
-    	$user->__set('password', $this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($password));
+    	$user->__set('password', $pass);
     	$user->__set("state", 1);
     	 
     	$default_roles = $em->getRepository('TsvUsers\Entity\Role')->findBy(array("id"=>array('user','admin')));

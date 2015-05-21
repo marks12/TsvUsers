@@ -16,6 +16,7 @@ use TsvUsers\Entity\User;
 use Zend\Console\Request as ConsoleRequest;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\Crypt\Password\Bcrypt;
 
 class TsvUsersController extends AbstractActionController
 {
@@ -54,8 +55,11 @@ class TsvUsersController extends AbstractActionController
     		$user->__set('display_name',$request->getPost()->display_name);
     		$user->__set('email',$request->getPost()->email);
     		
+    		$bcrypt = new Bcrypt(array("cost"=>14));
+    		$pass = $bcrypt->create($request->getPost()->password);
+    		
     		if(trim($request->getPost()->password))
-    			$user->__set('password',$this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($request->getPost()->password));
+    			$user->__set('password',$pass);
     		
     		$em->persist($user);
     		$em->flush();
@@ -121,7 +125,10 @@ class TsvUsersController extends AbstractActionController
     		$user->__set('email',$request->getPost()->email);
     		$user->__set('state',1);
     		
-   			$user->__set('password',$this->getServiceLocator()->get('zfcuser_user_hydrator')->getCryptoService()->create($request->getPost()->password));
+    		$bcrypt = new Bcrypt(array("cost"=>14));
+    		$pass = $bcrypt->create($request->getPost()->password);
+    		
+   			$user->__set('password',$pass);
 
     		$em->persist($user);
     		$em->flush();
